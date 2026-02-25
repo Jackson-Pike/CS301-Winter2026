@@ -1,0 +1,12 @@
+(1 point) Show how your program handles missing
+command-line parameters and "file-not-found" errors.
+
+(2 points) Demonstrate that your program correctly writes a sorted version of the data to a file.
+(2 points) Show that for the small Download small input, your intermediate values match those in the sample output.
+(2 points) Show that your program reports the correct number of comparisons for the small input and the regular input.
+(2 points) Explain how you converted the pseudocode into real code.
+(2 points) Demonstrate that your code sorts whole records, not just ID numbers.
+(3 points) Show that you generated 3 new inputs. Tell how big the inputs were, and how many comparisons were required to sort them.
+(2 points) Explain what Big-O value would you assign to this algorithm.
+(2 point) Show that each major section of your code contains explanatory comments.
+(2 point) Show that your source code is neatly and consistently indented.
