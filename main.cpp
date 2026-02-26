@@ -13,6 +13,8 @@ vector<Employee*> employees, employeesRandom, employeesTRE;
 bool printIterative = false;
 int numComparisons = 0;
 
+int partitionCount = 0;
+
 // Prep for random number generation, used later
 random_device rd;
 mt19937 gen(rd());
@@ -34,32 +36,38 @@ void exchange(auto &left, auto &right) {
 
 // Partition sub-routine, as seen in the textbook pseudocode. I did end up passing in the vector as a field, in order to have all three implementations on the same program
 int partition(int p, int r, auto &desiredVector) {
-    int partitionValue = desiredVector[r]->id;
+    partitionCount++;
+    int pivotValue = desiredVector[r]->id;
     int i = p-1;
 
-    for (int j = p; j <= r-1; j++) { // go all the way to r-1, because 0 based array
+    for (int j = p; j <= r-1; j++) { //Start running through the array, starting at p (start index) all the way to the last index
         numComparisons++;
-        if (desiredVector[j]->id <= partitionValue) {
-            i++;
-            exchange(desiredVector[i], desiredVector[j]);
+        if (desiredVector[j]->id <= pivotValue) {
+            i++; // Increase the 'size' of our less then or equal to portion (the left size).
+
+            //The value now at vector[i] is now actually greater than our pivot and needs to be exchanged with the current (j) element.
+            exchange(desiredVector[i], desiredVector[j]); // put j in left portion
             if (printIterative) printVector();
         }
     }
-    exchange(desiredVector[i+1], desiredVector[r]);
+    exchange(desiredVector[i+1], desiredVector[r]); // Move the pivot into its final position.
 
     if (printIterative) printVector();
-    return i+1;
+    return i+1; // Return i+1, which will be used in quicksort calls
 
 }
 
+// Standard Quicksort, using partition subroutine and recursive calls to itself.
 void quicksort(int p, int r) {
     if (p < r) {
         int q = partition(p, r, employees);
-        quicksort(p, q-1);
-        quicksort(q+1, r);
+        quicksort(p, q-1); // Recursively partition the left side
+        quicksort(q+1, r); // Right side, also recursive
     }
 }
 
+// Same as regular partition, except our index of our pivot is chosen randomly. This element is moved to the end of the array.
+// This routine modifies the employeesRandom vector, which is a direct copy of the employees vector after initial file read.
 int randomizedPartition(int p, int r) {
 
     uniform_int_distribution<> dist(p, r);
@@ -69,7 +77,7 @@ int randomizedPartition(int p, int r) {
     return partition(p, r, employeesRandom);
 }
 
-
+// The randomized quicksort. Utilizes randomizedPartition as a subroutine.
 void randomizedQuickSort(int p, int r) {
     if (p < r) {
         int q = randomizedPartition(p, r);
@@ -78,6 +86,8 @@ void randomizedQuickSort(int p, int r) {
     }
 }
 
+// Different implementation of quicksort. Modifies the employeesTRE vector which is a direct copy of employees vector as it was after initial file read
+// Uses a while loop to eliminate one recursive call in each call to treQuickSort.
 void treQuickSort(int p, int r) {
     while (p < r) {
         int q = partition(p, r, employeesTRE);
