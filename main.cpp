@@ -2,15 +2,20 @@
 #include <vector>
 #include <fstream>
 #include "Employee.h"
+#include <random>
 using namespace std;
 
 //Prepare ifstream, initialize fields
 ifstream ifs;
 fstream output;
 int numRecords = 0;
-vector<Employee*> employees;
+vector<Employee*> employees, employeesRandom, employeesTRE;
 bool printIterative = false;
 int numComparisons = 0;
+
+// Prep for random number generation, used later
+random_device rd;
+mt19937 gen(rd());
 
 // Helper method to print out the empId of each employee in the vector, all on one line.
 void printVector() {
@@ -20,23 +25,28 @@ void printVector() {
     cout << endl;
 }
 
-int partition(int p, int r) {
-    int x = employees[r]->id;
+// Helper method of my own creation, to streamline swapping vector elements
+void exchange(auto &left, auto &right) {
+    auto temp = left;
+    left = right;
+    right = temp;
+}
+
+// Partition sub-routine, as seen in the textbook pseudocode. I did end up passing in the vector as a field, in order to have all three implementations on the same program
+int partition(int p, int r, auto &desiredVector) {
+    int partitionValue = desiredVector[r]->id;
     int i = p-1;
 
-    for (int j = p; j <= r-1; j++) {
+    for (int j = p; j <= r-1; j++) { // go all the way to r-1, because 0 based array
         numComparisons++;
-        if (employees[j]->id <= x) {
+        if (desiredVector[j]->id <= partitionValue) {
             i++;
-            auto temp = employees[i];
-            employees[i] = employees[j];
-            employees[j] = temp;
+            exchange(desiredVector[i], desiredVector[j]);
+            if (printIterative) printVector();
         }
     }
+    exchange(desiredVector[i+1], desiredVector[r]);
 
-    auto temp = employees[i+1];
-    employees[i+1] = employees[r];
-    employees[r] = temp;
     if (printIterative) printVector();
     return i+1;
 
@@ -44,9 +54,35 @@ int partition(int p, int r) {
 
 void quicksort(int p, int r) {
     if (p < r) {
-        int q = partition(p, r);
+        int q = partition(p, r, employees);
         quicksort(p, q-1);
         quicksort(q+1, r);
+    }
+}
+
+int randomizedPartition(int p, int r) {
+
+    uniform_int_distribution<> dist(p, r);
+    int i = dist(gen); // get a random index for our partition index
+
+    exchange(employeesRandom[r], employeesRandom[i]); // make the employee at random index become last element in vector
+    return partition(p, r, employeesRandom);
+}
+
+
+void randomizedQuickSort(int p, int r) {
+    if (p < r) {
+        int q = randomizedPartition(p, r);
+        randomizedQuickSort(p, q-1);
+        randomizedQuickSort(q+1, r);
+    }
+}
+
+void treQuickSort(int p, int r) {
+    while (p < r) {
+        int q = partition(p, r, employeesTRE);
+        treQuickSort(p, q-1);
+        p = q + 1;
     }
 }
 
@@ -84,7 +120,6 @@ int main(int argc, char* argv[]) {
         /* Parse the file, creating an employee object and adding them to the employees vector
             in each iteration
         */
-        Employee** sheng = new Employee* [100];
 
         for (int i = 0; i < numRecords; i++) {
             string empName, empID, empAge, empJob, empYear;
@@ -95,13 +130,32 @@ int main(int argc, char* argv[]) {
             getline(ifs,empYear);
             Employee* e = new Employee(empName, stoi(empID), stoi(empAge), empJob, stoi(empYear));
             employees.push_back(e);
+
         }
+        employeesRandom = employees;
+        employeesTRE = employees;
         ifs.close();
 
     }
 
     // **************** SORT VECTOR AND STORE COMPARISONS **********************//
+
+    // Normal Quicksort on the employees vector
     quicksort(0, employees.size()-1);
+    cout << "Standard Quick - Number of Comparisons: " << numComparisons << endl;
+    numComparisons = 0; // reset comparisons to 0 in prepartion to rerun
+
+    // Randomized Pivot Value, quicksort on employeesRandom vector
+    randomizedQuickSort(0, employeesRandom.size()-1);
+    cout << "Randomized QuickSort - Number of Comparisons: " << numComparisons << endl;
+    numComparisons = 0; // reset comparisons to 0 again
+
+    // TRE Quicksort
+    treQuickSort(0, employeesTRE.size()-1);
+    cout << "TRE Quicksort Required Comparisons: " << numComparisons << endl;
+
+
+
 
 
     //******************* FILE OUTPUT **************************//
@@ -130,7 +184,7 @@ int main(int argc, char* argv[]) {
 
     }
 
-    cout << "Number of Comparisons: " << numComparisons << endl;
+
 
     return 0;
 }

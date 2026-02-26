@@ -34,13 +34,23 @@ Employee::Employee(string n, int i, int a, string j, int y) {
     year = y;
 }
 
+bool Employee::operator<(const Employee& other) const {
+    return id < other.id;
+}
+
+bool Employee::operator>(const Employee& other) const {
+    return id > other.id;
+}
+
+bool Employee::operator==(const Employee& other) const {
+    return id == other.id;
+}
 
 
 
 string Employee::say() {
 
 }
-
 
 
 

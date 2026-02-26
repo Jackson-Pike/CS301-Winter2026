@@ -27,6 +27,11 @@ public:
     int getAge() const;
     string getJob() const;
     int getYear() const;
+
+    // comparisons (by id)
+    bool operator<(const Employee& other) const;
+    bool operator>(const Employee& other) const;
+    bool operator==(const Employee& other) const;
 };
 
 
