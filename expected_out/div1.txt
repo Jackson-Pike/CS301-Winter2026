@@ -1,0 +1,13 @@
+Attempting to hash Oogle Gevi at index 4... SUCCESS!
+Attempting to hash Lim Dihu at index 1... SUCCESS!
+Attempting to hash Bozbo Xakiru at index 2... SUCCESS!
+Attempting to hash Jeearr Rumeli at index 7... SUCCESS!
+Attempting to hash Belwit Rovegovi at index 1...OUCH! Collision with Lim Dihu!
+Attempting to hash Duncwit Vetibu at index 8... SUCCESS!
+Attempting to hash Accardi Gutaxy at index 10... SUCCESS!
+Attempting to hash Duncwit Myvoryri at index 5... SUCCESS!
+Attempting to hash Jeearr Cena at index 11... SUCCESS!
+Attempting to hash Pheebor Ryve at index 2...OUCH! Collision with Bozbo Xakiru!
+Attempting to hash Orkan Xazo at index 9... SUCCESS!
+Attempting to hash Idwit Dycu at index 3... SUCCESS!
+Total collisions: 2
