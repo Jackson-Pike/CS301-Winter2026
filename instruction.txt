@@ -1,9 +1,17 @@
-(1 point) Show how your program handles missing command-line parameters and "file-not-found" errors.
-(2 points) Demonstrate that your program correctly writes a sorted version of the data to a file.
-(2 points) Show that for the small Download small input, your intermediate values match those in the sample output.
-(2 points) Show that your program reports the correct number of comparisons for the small input and the regular input.
-(2 points) Explain how you converted the pseudocode into real code.
-(5 points) Show that you generated 3 new inputs. Tell how big the inputs were, and how many comparisons were required to sort them, using standard Quicksort (3 points), Randomized Quicksort (3 points), and TRE-Quicksort (3 points).
-(2 points) Explain what Big-O value would you assign to this algorithm.
-(2 points) Show that each major section of your code contains explanatory comments.
-(2 points) Show that your source code is neatly and consistently indented.
+Your program should accept a single command-line parameter,
+ which is the name of the file to read. If the user forgets the command-line parameter,
+ or if the file cannot be found, your program should report an appropriate error message.
+
+
+The first line is the value of m, the size of the array. The second line is n,
+the number of records contained in the file. The remaining lines of the file
+are in the same format as before.
+
+Use the second field (ID#) of each record as the key for the hash algorithm.
+Perform the division method on the key to find the array-index number associated
+with the data. If that position in the array is vacant, then just print a message
+indicating that it was added at that position. If that position in the array is
+already in use, then print a message to that effect, and mention which element
+was already there.
+
+After you're done reading in the whole input, print out the total number of collisions.

@@ -3,97 +3,67 @@
 #include <fstream>
 #include "Employee.h"
 #include <random>
+#include <sstream>
+
 using namespace std;
 
 //Prepare ifstream, initialize fields
 ifstream ifs;
 fstream output;
-int numRecords = 0;
-vector<Employee*> employees, employeesRandom, employeesTRE;
-bool printIterative = false;
-int numComparisons = 0;
 
-int partitionCount = 0;
+int m = 0; // size of the array
+int divCollisions = 0;
+int multCollisions = 0;
+int partThreeCollisions = 0;
+int n = 0; // number of records contained in the file
+vector<Employee*>* hashtable;
+ostringstream partOne, partTwo, partThree;
 
-// Prep for random number generation, used later
-random_device rd;
-mt19937 gen(rd());
 
-// Helper method to print out the empId of each employee in the vector, all on one line.
-void printVector() {
-    for (auto employee : employees) {
-        cout << employee->getId() << " ";
-    }
-    cout << endl;
+
+int hash_div(int key) {
+    return key % m;
 }
 
-// Helper method of my own creation, to streamline swapping vector elements
-void exchange(auto &left, auto &right) {
-    auto temp = left;
-    left = right;
-    right = temp;
+int hash_mult(int key) {
+    //multiplication method
+    double A = (sqrt(5) - 1) / 2;
+    double actual = key * A;
+    int integerPortion = (int)actual;
+    double decimalPortion = actual - integerPortion;
+    return (int)(m * decimalPortion);
+    //return (int)(m * ((key * A) % 1));
 }
 
-// Partition sub-routine, as seen in the textbook pseudocode. I did end up passing in the vector as a field, in order to have all three implementations on the same program
-int partition(int p, int r, auto &desiredVector) {
-    partitionCount++;
-    int pivotValue = desiredVector[r]->id;
-    int i = p-1;
-
-    for (int j = p; j <= r-1; j++) { //Start running through the array, starting at p (start index) all the way to the last index
-        numComparisons++;
-        if (desiredVector[j]->id <= pivotValue) {
-            i++; // Increase the 'size' of our less then or equal to portion (the left size).
-
-            //The value now at vector[i] is now actually greater than our pivot and needs to be exchanged with the current (j) element.
-            exchange(desiredVector[i], desiredVector[j]); // put j in left portion
-            if (printIterative) printVector();
-        }
-    }
-    exchange(desiredVector[i+1], desiredVector[r]); // Move the pivot into its final position.
-
-    if (printIterative) printVector();
-    return i+1; // Return i+1, which will be used in quicksort calls
-
-}
-
-// Standard Quicksort, using partition subroutine and recursive calls to itself.
-void quicksort(int p, int r) {
-    if (p < r) {
-        int q = partition(p, r, employees);
-        quicksort(p, q-1); // Recursively partition the left side
-        quicksort(q+1, r); // Right side, also recursive
+void addSimpleElement(auto* &emp, auto &array, auto &builder, int index, int &colCounter) {
+    if (array[index] == nullptr) {
+        builder << "Position at index " << index << " was empty. Adding " << emp->name
+        << "with ID " << emp->id << " at that position" << endl;
+        array[index] = emp;
+    } else {
+        builder << "Collision. Position at index " << index << " is already occupied by the employee "
+              << emp->name << " with ID " << emp->id << endl;
+        colCounter++;
     }
 }
 
-// Same as regular partition, except our index of our pivot is chosen randomly. This element is moved to the end of the array.
-// This routine modifies the employeesRandom vector, which is a direct copy of the employees vector after initial file read.
-int randomizedPartition(int p, int r) {
+void addComplexElement(auto* &e) {
+    // Collision Check
+    int index = hash1(e->id);
+    vector<Employee*> &employees = hashtable[index];
+    employees.push_back(e);
+    int collisions = 0;
 
-    uniform_int_distribution<> dist(p, r);
-    int i = dist(gen); // get a random index for our partition index
-
-    exchange(employeesRandom[r], employeesRandom[i]); // make the employee at random index become last element in vector
-    return partition(p, r, employeesRandom);
-}
-
-// The randomized quicksort. Utilizes randomizedPartition as a subroutine.
-void randomizedQuickSort(int p, int r) {
-    if (p < r) {
-        int q = randomizedPartition(p, r);
-        randomizedQuickSort(p, q-1);
-        randomizedQuickSort(q+1, r);
+    //Collisions
+    if (employees.at(0) != e) {
+        partThreeCollisions++;
+        collisions = employees.size()-1;
     }
-}
 
-// Different implementation of quicksort. Modifies the employeesTRE vector which is a direct copy of employees vector as it was after initial file read
-// Uses a while loop to eliminate one recursive call in each call to treQuickSort.
-void treQuickSort(int p, int r) {
-    while (p < r) {
-        int q = partition(p, r, employeesTRE);
-        treQuickSort(p, q-1);
-        p = q + 1;
-    }
+    partThree << "Adding " << e->name << " to table at index " << index << " ("<< collisions << " collison";
+    if (collisions != 1) partThree << "s";
+    partThree << ")" << endl;
+
 }
 
 int main(int argc, char* argv[]) {
@@ -114,9 +84,6 @@ int main(int argc, char* argv[]) {
             exit(1);
         }
 
-        if (argc == 3 && (stoi(argv[2]) == 1)) {
-            printIterative = true;
-        }
     }
 
     // **************************** FILE PARSING ****************************** //
@@ -124,14 +91,31 @@ int main(int argc, char* argv[]) {
         // Begin parsing file
         string firstLine;
         getline(ifs, firstLine); // Get the number of records using first line
-        numRecords = stoi(firstLine); // cast to int
+        m = stoi(firstLine); // cast to int
+        string secondLine;
+        getline(ifs, secondLine);
+        n = stoi(secondLine);
+
+        Employee** simple_hash_div = new Employee*[m];
+        Employee** simple_hash_mult = new Employee*[m];
+        hashtable = new vector<Employee*>[m];
 
 
         /* Parse the file, creating an employee object and adding them to the employees vector
             in each iteration
         */
 
-        for (int i = 0; i < numRecords; i++) {
+        /**************************** HASHING ******************************************/
+
+        partOne << "<------------------- PART ONE - DIVISION METHOD ----------------------->" << endl;
+        partTwo << "<------------------- PART TWO - MULTIPLICATION METHOD ----------------->" << endl;
+        partThree << "<------------------- PART THREE - MULTIPLICATION METHOD ----------------->" << endl;
+
+        // Loop through the file, creating the employee object from each line, and adding employee to the specified hashtable
+        // Using addSimpleElement or addComplexElement (external methods which handle hashing, as well as collisions.)
+        for (int i = 0; i < n; i++) {
+
+            // Create Employee Object
             string empName, empID, empAge, empJob, empYear;
             getline(ifs,empName, '|');
             getline(ifs, empID, '|');
@@ -139,62 +123,40 @@ int main(int argc, char* argv[]) {
             getline(ifs,empJob, '|');
             getline(ifs,empYear);
             Employee* e = new Employee(empName, stoi(empID), stoi(empAge), empJob, stoi(empYear));
-            employees.push_back(e);
+
+
+            // Get Indexes from hash
+            int partOneIndex = hash_div(e->id);
+            int partTwoIndex = hash_mult(e->id);
+
+
+
+            if (argc == 3) {
+                addComplexElement(e);
+            } else {
+                addSimpleElement(e, simple_hash_div, partOne, partOneIndex, divCollisions);
+                addSimpleElement(e, simple_hash_mult, partTwo, partTwoIndex, multCollisions);
+            }
+
+
 
         }
-        employeesRandom = employees;
-        employeesTRE = employees;
+
+        if (argc == 3) {
+            partThree << "Total Collisions needing resolving: " << partThreeCollisions;
+            cout << partThree.str();
+        } else {
+            partOne << endl << "Total Collisions: " << divCollisions;
+            partOne << endl << endl;
+            partTwo << endl << "Total Collisions: " << multCollisions << endl << endl;
+
+            cout << partOne.str();
+            cout << partTwo.str();
+        }
+
         ifs.close();
 
     }
-
-    // **************** SORT VECTOR AND STORE COMPARISONS **********************//
-
-    // Normal Quicksort on the employees vector
-    quicksort(0, employees.size()-1);
-    cout << "Standard Quick - Number of Comparisons: " << numComparisons << endl;
-    numComparisons = 0; // reset comparisons to 0 in prepartion to rerun
-
-    // Randomized Pivot Value, quicksort on employeesRandom vector
-    randomizedQuickSort(0, employeesRandom.size()-1);
-    cout << "Randomized QuickSort - Number of Comparisons: " << numComparisons << endl;
-    numComparisons = 0; // reset comparisons to 0 again
-
-    // TRE Quicksort
-    treQuickSort(0, employeesTRE.size()-1);
-    cout << "TRE Quicksort Required Comparisons: " << numComparisons << endl;
-
-
-
-
-
-    //******************* FILE OUTPUT **************************//
-    {
-        string outputFilename = "output_" + string(argv[1]);
-        output.open(outputFilename, ios::out);
-
-        if (!output) {
-            cerr << "Error while opening file." << endl;
-            exit(1);
-        }
-
-        for (auto employee : employees) {
-            output << employee->getName();
-            output << "|";
-            output << employee->getId();
-            output << "|";
-            output << employee->getAge();
-            output << "|";
-            output << employee->getJob();
-            output << "|";
-            output << employee->getYear() << endl;
-        }
-
-        output.close();
-
-    }
-
-
 
     return 0;
 }
