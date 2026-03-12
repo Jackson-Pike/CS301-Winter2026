@@ -1,17 +1,12 @@
-Your program should accept a single command-line parameter,
- which is the name of the file to read. If the user forgets the command-line parameter,
- or if the file cannot be found, your program should report an appropriate error message.
+n your video, you must:
 
-
-The first line is the value of m, the size of the array. The second line is n,
-the number of records contained in the file. The remaining lines of the file
-are in the same format as before.
-
-Use the second field (ID#) of each record as the key for the hash algorithm.
-Perform the division method on the key to find the array-index number associated
-with the data. If that position in the array is vacant, then just print a message
-indicating that it was added at that position. If that position in the array is
-already in use, then print a message to that effect, and mention which element
-was already there.
-
-After you're done reading in the whole input, print out the total number of collisions.
+(1 point) Show how your program handles missing command-line parameters and "file-not-found" errors.
+(2 points) Explain how you implemented the division method.
+(2 points) Explain how you implemented the multiplication method.
+(2 points) Explain how you implemented collision resolution.
+(2 points) Explain whether you prefer the division or multiplication method, and why.
+(3 points) Part 1: Demonstrate that your program produces the correct output for the three test files.
+(3 points) Part 2: Demonstrate that your program produces the correct output for the three test files.
+(3 points) Part 3: Demonstrate that your program reports the correct total collisions for the three test files.
+(1 point) Show that each major section of your code contains explanatory comments. 
+(1 point) Show that your source code is neatly and consistently indented.

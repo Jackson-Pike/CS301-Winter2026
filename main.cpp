@@ -20,11 +20,12 @@ vector<Employee*>* hashtable;
 ostringstream partOne, partTwo, partThree;
 
 
-
+// Division hash
 int hash_div(int key) {
     return key % m;
 }
 
+// Multiplication Method - Discussed and developed with Bro Draper in class.
 int hash_mult(int key) {
     //multiplication method
     double A = (sqrt(5) - 1) / 2;
@@ -35,21 +36,32 @@ int hash_mult(int key) {
     //return (int)(m * ((key * A) % 1));
 }
 
+/* Adds a specified employee pointer to a specificed container, writing information to a stringstream.
+* Increments the collision counter (a parameter passed by reference)
+*
+ */
 void addSimpleElement(auto* &emp, auto &array, auto &builder, int index, int &colCounter) {
     if (array[index] == nullptr) {
         builder << "Position at index " << index << " was empty. Adding " << emp->name
-        << "with ID " << emp->id << " at that position" << endl;
+        << " with ID " << emp->id << " at that position" << endl;
         array[index] = emp;
     } else {
+        Employee* existing = array[index];
         builder << "Collision. Position at index " << index << " is already occupied by the employee "
-              << emp->name << " with ID " << emp->id << endl;
+              << existing->name << " with ID " << existing->id << endl;
         colCounter++;
     }
 }
 
+ /* hashes the emp id to get the index, using the division method.
+// Checks the array of vectors (employee pointers) - adds
+// the parameter e to the vector at the computed index.
+*  If the employee pointer at index 0 of the vector is not
+*  e, then we know there was a collision.
+*/
 void addComplexElement(auto* &e) {
     // Collision Check
-    int index = hash1(e->id);
+    int index = hash_div(e->id);
     vector<Employee*> &employees = hashtable[index];
     employees.push_back(e);
     int collisions = 0;
