@@ -1,12 +1,21 @@
-n your video, you must:
+In your video, you must:
 
 (1 point) Show how your program handles missing command-line parameters and "file-not-found" errors.
-(2 points) Explain how you implemented the division method.
-(2 points) Explain how you implemented the multiplication method.
-(2 points) Explain how you implemented collision resolution.
-(2 points) Explain whether you prefer the division or multiplication method, and why.
-(3 points) Part 1: Demonstrate that your program produces the correct output for the three test files.
-(3 points) Part 2: Demonstrate that your program produces the correct output for the three test files.
-(3 points) Part 3: Demonstrate that your program reports the correct total collisions for the three test files.
-(1 point) Show that each major section of your code contains explanatory comments. 
+(3 points) Explain how you hash the name string into an integer.
+(1 point) Convince the viewer that you are not using any pre-built hashtable-related API calls for building the hashtable.
+(2 points) Show how you store records into the hashtable.
+(3 points) Show how you look up records in the hashtable.
+(2 points) Show how you resolve collisions in Part 2.
+(2 points) Show how you keep count of collisions in Part 2.
+(2 points) Show that your program prints out a "log" of what it's doing, similar to what's in my sample output files.
+(2 points) Show that your program prints out the total number of collisions after parsing the whole file.
+(1 point) Show that each major section of your code contains explanatory comments.
 (1 point) Show that your source code is neatly and consistently indented.
+-------------------------------------------------------
+TOTAL: 20 points
+
+Extra Credit:
+(+1 point) EARLY BIRD BONUS: if you submit your code and video to Canvas at least 1 day before the due date.
+(+1 point) EXTRA CREDIT if your total collisions is less than Bro. Draper's sample output for lookup1.txt.
+(+1 point) EXTRA CREDIT if your total collisions is less than Bro. Draper's sample output for lookup2.txt.
+(+1 point) EXTRA CREDIT if your total collisions is less than Bro. Draper's sample output for lookup3.txt.
